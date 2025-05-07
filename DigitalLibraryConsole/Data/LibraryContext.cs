@@ -10,17 +10,14 @@ namespace DigitalLibraryConsole.Data
 {
     public class LibraryContext : DbContext
     {
+        public LibraryContext(DbContextOptions<LibraryContext> options) : base(options)
+        {
+        }
+
         public DbSet<Book> Books { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<LendingRecord> LendingRecords { get; set; }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            var dbPath = Path.Combine(AppContext.BaseDirectory, "library.db");
-            optionsBuilder.UseSqlite($"Data Source={dbPath}");
-        }
-
-
-
+     
         public static void Seed(LibraryContext context)
         {
             if (!context.Books.Any())

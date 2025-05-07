@@ -1,15 +1,21 @@
 ﻿using DigitalLibraryConsole.Data;
 using DigitalLibraryConsole.Models;
 using DigitalLibraryConsole.Service;
+using Microsoft.EntityFrameworkCore;
 
 class Program
 {
     static void Main()
     {
-        using var context = new LibraryContext();
-        var service = new LibraryService(context);
+        var options = new DbContextOptionsBuilder<LibraryContext>()
+        .UseSqlite($"Data Source={Path.Combine(AppContext.BaseDirectory, "library.db")}")
+        .Options;
+
+        using var context = new LibraryContext(options);
 
         LibraryContext.Seed(context);
+
+        var service = new LibraryService(context);
 
         bool running = true;
         while (running)

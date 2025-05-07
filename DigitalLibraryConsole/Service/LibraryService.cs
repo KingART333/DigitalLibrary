@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DigitalLibraryConsole.Data;
 using DigitalLibraryConsole.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace DigitalLibraryConsole.Service
 {
@@ -21,6 +22,16 @@ namespace DigitalLibraryConsole.Service
         {
             _context.Books.Add(book);
             _context.SaveChanges();
+        }
+
+        public void DeleteBook(int bookId)
+        {
+            var book = _context.Books.Find(bookId);
+            if (book != null)
+            {
+                _context.Books.Remove(book);
+                _context.SaveChanges();
+            }
         }
 
         public void RegisterUser(User user)
@@ -60,8 +71,8 @@ namespace DigitalLibraryConsole.Service
                 var record = new LendingRecord(userId, bookId, DateTime.Now, DateTime.Now.AddDays(14));
                 _context.LendingRecords.Add(record);
                 book.NumberOfAvailableCopies--;
-
                 _context.SaveChanges();
+
                 return true; // Book borrowed successfully
             }
             catch (Exception ex)
@@ -77,19 +88,18 @@ namespace DigitalLibraryConsole.Service
             if (record == null || record.ReturnDate != null)
             {
                 Console.WriteLine("Invalid record.");
-                return false; // Invalid record
+                return false;
             }
 
             record.ReturnDate = DateTime.Now;
 
             var book = _context.Books.Find(record.BookId);
-            if (book != null)
-            {
-                book.NumberOfAvailableCopies++;
-            }
+            if (book == null)
+                return false;
             _context.SaveChanges();
-            return true; // Book returned successfully
+            return true; 
         }
+
 
         public List<Book> GetAvailableBooks()
         {
@@ -101,11 +111,36 @@ namespace DigitalLibraryConsole.Service
             return _context.Users.ToList();
         }
 
+        public List<LendingRecord> GetAllLendingRecords()
+        {
+            return _context.LendingRecords
+                .Include(r => r.User)
+                .Include(r => r.Book)
+                .ToList();
+        }
+
         public List<LendingRecord> GetOverdueRecords()
         {
             return _context.LendingRecords
                 .Where(r => r.ReturnDate == null && r.DueDate < DateTime.Now)
                 .ToList();
         }
+
+        public void DeleteLendingRecord(int id)
+        {
+            var record = _context.LendingRecords.Find(id);
+            if (record != null)
+            {
+                var book = _context.Books.Find(record.BookId);
+                if (book != null && record.ReturnDate == null)
+                {
+                    book.NumberOfAvailableCopies++;
+                }
+
+                _context.LendingRecords.Remove(record);
+                _context.SaveChanges();
+            }
+        }
+
     }
 }
