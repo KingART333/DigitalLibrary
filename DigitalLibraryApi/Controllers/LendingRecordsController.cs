@@ -10,80 +10,77 @@ namespace DigitalLibraryApi.Controllers
     public class LendingRecordsController : ControllerBase
     {
         private readonly LibraryService _libraryService;
+
         public LendingRecordsController(LibraryService libraryService)
         {
             _libraryService = libraryService;
         }
 
-        //Get all lending records
+        // Get all lending records
         // GET: api/lendingrecords
         [HttpGet]
-        public IActionResult GetAllLendingRecords()
+        public IActionResult GetAllLendingRecords(int pageNumber = 1, int pageSize = 10)
         {
-            var records = _libraryService.GetAllLendingRecords();
+            var records = _libraryService.GetAllLendingRecords(pageNumber, pageSize);
             return Ok(records);
         }
 
-        //Get lending record by id
+        // Get lending record by id
         // GET: api/lendingrecords/{id}
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var record = _libraryService.GetAllLendingRecords().FirstOrDefault(r => r.Id == id);
+            var record = _libraryService.GetLendingRecordById(id);
             return record == null ? NotFound() : Ok(record);
         }
 
-        //Get lending record by user id
+        // Get lending records by user id
         // GET: api/lendingrecords/user/{userId}
         [HttpGet("user/{userId}")]
-        public IActionResult GetByUserId(int userId)
+        public IActionResult GetByUserId(int userId, int pageNumber = 1, int pageSize = 10)
         {
-            var records = _libraryService.GetAllLendingRecords()
-                .Where(r => r.UserId == userId).ToList();
+            var records = _libraryService.GetLendingRecordsByUser(userId, pageNumber, pageSize);
             return records.Count == 0 ? NotFound() : Ok(records);
         }
 
-        //Get lending record by book id
+        // Get lending records by book id
         // GET: api/lendingrecords/book/{bookId}
         [HttpGet("book/{bookId}")]
-        public IActionResult GetByBookId(int bookId)
+        public IActionResult GetByBookId(int bookId, int pageNumber = 1, int pageSize = 10)
         {
-            var records = _libraryService.GetAllLendingRecords()
-                .Where(r => r.BookId == bookId).ToList();
+            var records = _libraryService.GetLendingRecordsByBook(bookId, pageNumber, pageSize);
             return records.Count == 0 ? NotFound() : Ok(records);
         }
 
-        //Get all overdue lending record by id
+        // Get all overdue lending records (paginated)
         // GET: api/lendingrecords/overdue
         [HttpGet("overdue")]
-        public IActionResult GetOverdue()
+        public IActionResult GetOverdue(int pageNumber = 1, int pageSize = 10)
         {
-            var records = _libraryService.GetOverdueRecords();
+            var records = _libraryService.GetOverdueRecords(pageNumber, pageSize);
             return Ok(records);
         }
 
-        //Get all overdue lending record by user id
+        // Get overdue lending records by user id (paginated)
         // GET: api/lendingrecords/overdue/user/{userId}
         [HttpGet("overdue/user/{userId}")]
-        public IActionResult GetOverdueByUserId(int userId)
+        public IActionResult GetOverdueByUserId(int userId, int pageNumber = 1, int pageSize = 10)
         {
-            var records = _libraryService.GetOverdueRecords()
-                .Where(r => r.UserId == userId).ToList();
+            var records = _libraryService.GetOverdueRecordsByUser(userId, pageNumber, pageSize);
             return records.Count == 0 ? NotFound() : Ok(records);
         }
 
-        //Get all overdue lending record by book id
+        // Get overdue lending records by book id (paginated)
         // GET: api/lendingrecords/overdue/book/{bookId}
         [HttpGet("overdue/book/{bookId}")]
-        public IActionResult GetOverdueByBookId(int bookId)
+        public IActionResult GetOverdueByBookId(int bookId, int pageNumber = 1, int pageSize = 10)
         {
-            var records = _libraryService.GetOverdueRecords()
-                .Where(r => r.BookId == bookId).ToList();
+            var records = _libraryService.GetOverdueRecordsByBook(bookId, pageNumber, pageSize);
             return records.Count == 0 ? NotFound() : Ok(records);
         }
 
-        //Getting book
-        // POST: api/lendingrecords
+        // Borrow book
+        // POST: api/lendingrecords/borrow
         [HttpPost]
         public IActionResult BorrowBook([FromBody] CreateLendingRecordDto dto)
         {
@@ -92,11 +89,10 @@ namespace DigitalLibraryApi.Controllers
             if (!success)
                 return BadRequest("Borrow failed. Check user or book availability.");
 
-            // Optionally: fetch the newly created record if needed (e.g., from LendingRecords with latest borrowDate)
             return Ok("Book borrowed successfully.");
         }
 
-        //Returning book
+        // Return book
         // PUT: api/lendingrecords/return/{recordId}
         [HttpPut("return/{recordId}")]
         public IActionResult ReturnBook(int recordId)
@@ -106,9 +102,7 @@ namespace DigitalLibraryApi.Controllers
             if (!success)
                 return BadRequest("Return failed. Invalid record or already returned.");
 
-            var updated = _libraryService.GetAllLendingRecords()
-                .FirstOrDefault(r => r.Id == recordId);
-
+            var updated = _libraryService.GetLendingRecordById(recordId);
             if (updated == null)
                 return NotFound();
 
@@ -125,7 +119,7 @@ namespace DigitalLibraryApi.Controllers
             return Ok(dto);
         }
 
-        //Delete lending record
+        // Delete lending record
         // DELETE: api/lendingrecords/{id}
         [HttpDelete("{id}")]
         public IActionResult DeleteLendingRecord(int id)

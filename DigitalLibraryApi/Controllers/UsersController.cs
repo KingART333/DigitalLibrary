@@ -15,48 +15,48 @@ namespace DigitalLibraryApi.Controllers
             _libraryService = libraryService;
         }
 
-        //Get all users
+        // Get all users
         // GET: api/users
         [HttpGet]
-        public IActionResult GetAllUsers()
+        public IActionResult GetAllUsers(int pageNumber = 1, int pageSize = 10)
         {
-            var users = _libraryService.GetAllUsers();
+            var users = _libraryService.GetAllUsers(pageNumber, pageSize);
             return Ok(users);
         }
 
-        //Get user by id
+        // Get user by id
         // GET: api/users/{id}
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var user = _libraryService.GetAllUsers().FirstOrDefault(u => u.Id == id);
+            var user = _libraryService.GetUserById(id);
             return user == null ? NotFound() : Ok(user);
         }
 
-        //Get user by name
-        //Get: api/users/name/{name}
+        // Get user by name
+        // GET: api/users/name/{name}
         [HttpGet("name/{name}")]
         public IActionResult GetByName(string name)
         {
-            var user = _libraryService.GetAllUsers().FirstOrDefault(u => u.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            var user = _libraryService.GetUserByName(name);
             return user == null ? NotFound() : Ok(user);
         }
 
         //Get user by surname
-        //Get: api/users/surname/{surname}
+        // GET: api/users/surname/{surname}
         [HttpGet("surname/{surname}")]
         public IActionResult GetBySurname(string surname)
         {
-            var user = _libraryService.GetAllUsers().FirstOrDefault(u => u.Surname.Equals(surname, StringComparison.OrdinalIgnoreCase));
+            var user = _libraryService.GetUserBySurname(surname);
             return user == null ? NotFound() : Ok(user);
         }
 
-        //Get user by phone number
-        //Get: api/users/phone/{phoneNumber}
+        // Get user by PhoneNumber
+        // GET: api/users/phone/{phoneNumber}
         [HttpGet("phone/{phoneNumber}")]
         public IActionResult GetByPhoneNumber(string phoneNumber)
         {
-            var user = _libraryService.GetAllUsers().FirstOrDefault(u => u.PhoneNumber.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase));
+            var user = _libraryService.GetUserByPhoneNumber(phoneNumber);
             return user == null ? NotFound() : Ok(user);
         }
 
@@ -66,7 +66,7 @@ namespace DigitalLibraryApi.Controllers
         public IActionResult Create(User user)
         {
             _libraryService.RegisterUser(user);
-            return CreatedAtAction(nameof(GetAllUsers), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
         }
 
         //Delete user

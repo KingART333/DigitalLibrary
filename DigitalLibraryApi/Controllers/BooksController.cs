@@ -18,9 +18,9 @@ namespace DigitalLibraryApi.Controllers
         //Get all books
         // GET: api/books
         [HttpGet]
-        public IActionResult GetAllBooks()
+        public IActionResult GetAllBooks(int pageNumber = 1, int pageSize = 10)
         {
-            var books = _libraryService.GetAvailableBooks();
+            var books = _libraryService.GetAvailableBooks(pageNumber, pageSize);
             return Ok(books);
         }
 
@@ -38,17 +38,17 @@ namespace DigitalLibraryApi.Controllers
         [HttpGet("title/{title}")]
         public IActionResult GetByTitle(string title)
         {
-            var book = _libraryService.GetAvailableBooks().FirstOrDefault(b => b.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
+            var book = _libraryService.GetBookByTitle(title);
             return book == null ? NotFound() : Ok(book);
         }
 
         //Get book by Author
         //Get: api/books/author/{author}
         [HttpGet("author/{author}")]
-        public IActionResult GetByAuthor(string author)
+        public IActionResult GetByAuthor(string author, int pageNumber = 1, int pageSize = 10)
         {
-            var book = _libraryService.GetAvailableBooks().FirstOrDefault(b => b.Author.Equals(author, StringComparison.OrdinalIgnoreCase));
-            return book == null ? NotFound() : Ok(book);
+            var books = _libraryService.GetBooksByAuthor(author, pageNumber, pageSize);
+            return books == null || books.Count == 0 ? NotFound() : Ok(books);
         }
 
         //Get book by ISBN
@@ -56,7 +56,7 @@ namespace DigitalLibraryApi.Controllers
         [HttpGet("isbn/{isbn}")]
         public IActionResult GetByISBN(string isbn)
         {
-            var book = _libraryService.GetAvailableBooks().FirstOrDefault(b => b.ISBN.Equals(isbn, StringComparison.OrdinalIgnoreCase));
+            var book = _libraryService.GetBookByISBN(isbn);
             return book == null ? NotFound() : Ok(book);
         }
 
@@ -68,6 +68,5 @@ namespace DigitalLibraryApi.Controllers
             _libraryService.DeleteBook(id);
             return NoContent();
         }
-
     }
 }

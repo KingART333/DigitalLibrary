@@ -50,6 +50,27 @@ namespace DigitalLibraryConsole.Service
             }
         }
 
+        public User? GetUserById(int id)
+        {
+            return _context.Users.FirstOrDefault(u => u.Id == id);
+        }
+
+        public User? GetUserByName(string name)
+        {
+            return _context.Users.FirstOrDefault(u => u.Name.ToLower() == name.ToLower());
+        }
+
+        public User? GetUserBySurname(string surname)
+        {
+            return _context.Users.FirstOrDefault(u => u.Surname.ToLower() == surname.ToLower());
+        }
+
+        public User? GetUserByPhoneNumber(string phoneNumber)
+        {
+            return _context.Users.FirstOrDefault(u => u.PhoneNumber == phoneNumber);
+        }
+
+
         public bool BorrowBook(int userId, int bookId)
         {
             try
@@ -101,28 +122,63 @@ namespace DigitalLibraryConsole.Service
         }
 
 
-        public List<Book> GetAvailableBooks()
+        public List<Book> GetAvailableBooks(int pageNumber = 1, int pageSize = 10)
         {
-            return _context.Books.Where(b => b.NumberOfAvailableCopies > 0).ToList();
+            return _context.Books
+                .Where(b => b.NumberOfAvailableCopies > 0)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
         }
 
-        public List<User> GetAllUsers()
+        public List<User> GetAllUsers(int pageNumber = 1, int pageSize = 10)
         {
-            return _context.Users.ToList();
+            return _context.Users
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
         }
 
-        public List<LendingRecord> GetAllLendingRecords()
+        public List<LendingRecord> GetAllLendingRecords(int pageNumber = 1, int pageSize = 10)
         {
             return _context.LendingRecords
                 .Include(r => r.User)
                 .Include(r => r.Book)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToList();
         }
 
-        public List<LendingRecord> GetOverdueRecords()
+        public List<LendingRecord> GetOverdueRecords(int pageNumber = 1, int pageSize = 10)
         {
             return _context.LendingRecords
+                .Include(r => r.User)
+                .Include(r => r.Book)
                 .Where(r => r.ReturnDate == null && r.DueDate < DateTime.Now)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+        public List<LendingRecord> GetOverdueRecordsByUser(int userId, int pageNumber, int pageSize)
+        {
+            return _context.LendingRecords
+                .Include(r => r.User)
+                .Include(r => r.Book)
+                .Where(r => r.UserId == userId && r.ReturnDate == null && r.DueDate < DateTime.Now)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+        public List<LendingRecord> GetOverdueRecordsByBook(int bookId, int pageNumber, int pageSize)
+        {
+            return _context.LendingRecords
+                .Include(r => r.User)
+                .Include(r => r.Book)
+                .Where(r => r.BookId == bookId && r.ReturnDate == null && r.DueDate < DateTime.Now)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToList();
         }
 
@@ -141,6 +197,58 @@ namespace DigitalLibraryConsole.Service
                 _context.SaveChanges();
             }
         }
+
+        public List<LendingRecord> GetLendingRecordsByUser(int userId, int pageNumber, int pageSize)
+        {
+            return _context.LendingRecords
+                .Include(r => r.User)
+                .Include(r => r.Book)
+                .Where(r => r.UserId == userId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+        public List<LendingRecord> GetLendingRecordsByBook(int bookId, int pageNumber, int pageSize)
+        {
+            return _context.LendingRecords
+                .Include(r => r.User)
+                .Include(r => r.Book)
+                .Where(r => r.BookId == bookId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+        public LendingRecord? GetLendingRecordById(int id)
+        {
+            return _context.LendingRecords
+                .Include(r => r.User)
+                .Include(r => r.Book)
+                .FirstOrDefault(r => r.Id == id);
+        }
+
+        public Book? GetBookByTitle(string title)
+        {
+            return _context.Books
+                .FirstOrDefault(b => b.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public List<Book> GetBooksByAuthor(string author, int pageNumber = 1, int pageSize = 10)
+        {
+            return _context.Books
+                .Where(b => EF.Functions.Like(b.Author, author))
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+        public Book? GetBookByISBN(string isbn)
+        {
+            return _context.Books
+                .FirstOrDefault(b => b.ISBN.Equals(isbn, StringComparison.OrdinalIgnoreCase));
+        }
+
 
     }
 }
