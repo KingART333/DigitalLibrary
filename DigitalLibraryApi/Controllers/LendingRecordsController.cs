@@ -1,10 +1,12 @@
 ﻿using DigitalLibraryApi.DTOs;
 using DigitalLibraryConsole.Models;
 using DigitalLibraryConsole.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DigitalLibraryApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class LendingRecordsController : ControllerBase
