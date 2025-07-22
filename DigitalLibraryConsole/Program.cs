@@ -85,6 +85,14 @@ class Program
     static void RegisterUser(LibraryService service)
     {
         Console.WriteLine("Register User");
+        Console.WriteLine("Age: ");
+        Console.Write("Age: ");
+        if (!int.TryParse(Console.ReadLine(), out int age))
+        {
+            Console.WriteLine("Invalid input for age.");
+            Console.ReadKey();
+            return;
+        }
         Console.Write("Name: ");
         var name = Console.ReadLine();
         Console.Write("Surname: ");
@@ -92,7 +100,8 @@ class Program
         Console.Write("Phone Number: ");
         var phoneNumber = Console.ReadLine();
 
-        var user = new User(name, surname, phoneNumber);
+
+        var user = new User(age ,name, surname, phoneNumber);
         service.RegisterUser(user);
         Console.WriteLine("User registered successfully!");
         Console.ReadKey();

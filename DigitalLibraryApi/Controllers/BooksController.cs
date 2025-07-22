@@ -1,24 +1,26 @@
-﻿using DigitalLibraryConsole.Models;
-using DigitalLibraryConsole.Service;
+﻿using DigitalLibraryConsole.Interfaces;
+using DigitalLibraryConsole.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DigitalLibraryApi.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class BooksController : ControllerBase
     {
-        private readonly LibraryService _libraryService;
+        private readonly ILibraryService _libraryService;
 
-        public BooksController(LibraryService libraryService)
+        public BooksController(ILibraryService libraryService)
         {
             _libraryService = libraryService;
         }
 
         //Get all books
         // GET: api/books
+        //[Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AtLeast18")]
         [HttpGet]
         public IActionResult GetAllBooks(int pageNumber = 1, int pageSize = 10)
         {
@@ -26,7 +28,7 @@ namespace DigitalLibraryApi.Controllers
             return Ok(books);
         }
 
-        //Get book by id
+        // add book
         // POST: api/books
         [HttpPost]
         public IActionResult Create(Book book)
@@ -37,6 +39,7 @@ namespace DigitalLibraryApi.Controllers
 
         //Get book by Title
         //Get: api/books/title/{title}
+        [Authorize(Roles = "User")]
         [HttpGet("title/{title}")]
         public IActionResult GetByTitle(string title)
         {

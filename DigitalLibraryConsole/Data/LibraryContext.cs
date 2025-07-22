@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DigitalLibraryConsole.Models;
+﻿using DigitalLibraryConsole.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitalLibraryConsole.Data
@@ -17,7 +12,7 @@ namespace DigitalLibraryConsole.Data
         public DbSet<Book> Books { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<LendingRecord> LendingRecords { get; set; }
-     
+
         public static void Seed(LibraryContext context)
         {
             if (!context.Books.Any())
@@ -31,8 +26,8 @@ namespace DigitalLibraryConsole.Data
             if (!context.Users.Any())
             {
                 context.Users.AddRange(
-                    new User { Name = "John", Surname = "Doe", PhoneNumber = "123-456-7890" },
-                    new User { Name = "Jane", Surname = "Smith", PhoneNumber = "098-765-4321" }
+                    new User { Age = 25, Name = "John", Surname = "Doe", PhoneNumber = "123-456-7890" },
+                    new User { Age = 30, Name = "Jane", Surname = "Smith", PhoneNumber = "098-765-4321" }
                 );
             }
 

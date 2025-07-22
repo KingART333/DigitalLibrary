@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DigitalLibraryConsole.Models
+﻿namespace DigitalLibraryConsole.Models
 {
     public class LendingRecord
     {

@@ -1,5 +1,5 @@
-﻿using DigitalLibraryConsole.Models;
-using DigitalLibraryConsole.Service;
+﻿using DigitalLibraryConsole.Interfaces;
+using DigitalLibraryConsole.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +10,9 @@ namespace DigitalLibraryApi.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly LibraryService _libraryService;
+        private readonly ILibraryService _libraryService;
 
-        public UsersController(LibraryService libraryService)
+        public UsersController(ILibraryService libraryService)
         {
             _libraryService = libraryService;
         }

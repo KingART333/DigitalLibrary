@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using DigitalLibraryApi.DTOs;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DigitalLibraryApi.Controllers
 {
@@ -21,15 +21,26 @@ namespace DigitalLibraryApi.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginDto dto)
         {
-            // Must replace /////////////////////
-            if (dto.Username != "admin" || dto.Password != "password")
+            string role = null;
+
+            if (dto.Username == "admin" && dto.Password == "password")
+            {
+                role = "Admin";
+            }
+            else if (dto.Username == "user" && dto.Password == "password")
+            {
+                role = "User";
+            }
+
+            if (role == null)
                 return Unauthorized();
 
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, "1"),
                 new Claim(ClaimTypes.Name, dto.Username),
-                new Claim(ClaimTypes.Role, "Admin")
+                new Claim(ClaimTypes.Role, role),
+                new Claim("Age", dto.Age.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
@@ -43,7 +54,12 @@ namespace DigitalLibraryApi.Controllers
                 signingCredentials: creds
             );
 
-            return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
+            return Ok(new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                role
+            });
         }
+
     }
 }

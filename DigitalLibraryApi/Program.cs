@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using System.Text;
 using DigitalLibraryConsole.Data;
+using DigitalLibraryConsole.Interfaces;
 using DigitalLibraryConsole.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +21,7 @@ namespace DigitalLibraryApi
             builder.Services.AddDbContext<LibraryContext>(options =>
                 options.UseSqlite($"Data Source={dbPath}")); ;
 
-            builder.Services.AddScoped<LibraryService>();
+            builder.Services.AddScoped<ILibraryService, LibraryService>();
             builder.Services.AddControllers();
 
             builder.Services.AddControllers();
@@ -71,11 +73,26 @@ namespace DigitalLibraryApi
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = builder.Configuration["Jwt:Issuer"],
                         ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(key)
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        RoleClaimType = ClaimTypes.Role
                     };
                 });
 
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AtLeast18", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireAssertion(context =>
+                    {
+                        var ageClaim = context.User.FindFirst("Age");
+
+                        return ageClaim != null &&
+                               int.TryParse(ageClaim.Value, out var age) &&
+                               age >= 18;
+                    });
+                });
+            });
 
             var app = builder.Build();
 

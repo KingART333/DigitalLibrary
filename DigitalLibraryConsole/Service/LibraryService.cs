@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DigitalLibraryConsole.Data;
+﻿using DigitalLibraryConsole.Data;
+using DigitalLibraryConsole.Interfaces;
 using DigitalLibraryConsole.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitalLibraryConsole.Service
 {
-    public class LibraryService
+    public class LibraryService : ILibraryService
     {
         private readonly LibraryContext _context;
 
@@ -118,7 +114,7 @@ namespace DigitalLibraryConsole.Service
             if (book == null)
                 return false;
             _context.SaveChanges();
-            return true; 
+            return true;
         }
 
 
@@ -231,7 +227,7 @@ namespace DigitalLibraryConsole.Service
         public Book? GetBookByTitle(string title)
         {
             return _context.Books
-                .FirstOrDefault(b => b.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(b => b.Title.ToLower() == title.ToLower());
         }
 
         public List<Book> GetBooksByAuthor(string author, int pageNumber = 1, int pageSize = 10)
@@ -246,7 +242,7 @@ namespace DigitalLibraryConsole.Service
         public Book? GetBookByISBN(string isbn)
         {
             return _context.Books
-                .FirstOrDefault(b => b.ISBN.Equals(isbn, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(b => b.ISBN.ToLower() == isbn.ToLower());
         }
 
 

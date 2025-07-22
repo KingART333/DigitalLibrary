@@ -1,6 +1,5 @@
 ﻿using DigitalLibraryApi.DTOs;
-using DigitalLibraryConsole.Models;
-using DigitalLibraryConsole.Service;
+using DigitalLibraryConsole.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,9 +10,9 @@ namespace DigitalLibraryApi.Controllers
     [Route("api/[controller]")]
     public class LendingRecordsController : ControllerBase
     {
-        private readonly LibraryService _libraryService;
+        private readonly ILibraryService _libraryService;
 
-        public LendingRecordsController(LibraryService libraryService)
+        public LendingRecordsController(ILibraryService libraryService)
         {
             _libraryService = libraryService;
         }
